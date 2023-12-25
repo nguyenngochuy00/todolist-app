@@ -1,32 +1,33 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 import { Todo } from '../../@types/todo.type'
 import styles from './taskInput.module.scss'
+import { TodoTypes } from '../../PropTypes/todo.proptype'
 
 interface TaskInputProps {
   addTodo: (name: string) => void
-  currentTodo: Todo | null
   editTodo: (name: string) => void
   finishEditTodo: () => void
+  currentTodo: Todo | null
 }
 
-function TaskInput(props: TaskInputProps) {
+export default function TaskInput(props: TaskInputProps) {
   const { addTodo, currentTodo, editTodo, finishEditTodo } = props
   const [name, setName] = useState<string>('')
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (currentTodo) {
       finishEditTodo()
-      if (name)
-        setName('')
+      if (name) setName('')
     } else {
       addTodo(name)
       setName('')
     }
   }
 
-  function onChangeInput(event: React.ChangeEvent<HTMLInputElement>) {
-    const value = event.target.value
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target
     if (currentTodo) {
       editTodo(value)
     } else {
@@ -44,10 +45,15 @@ function TaskInput(props: TaskInputProps) {
           value={currentTodo ? currentTodo.name : name}
           onChange={onChangeInput}
         />
-        <button type='submit'>{currentTodo ? '✔' : '➕'}</button>
+        <button type='submit'>{currentTodo ? '✔️' : '➕'}</button>
       </form>
     </div>
   )
 }
 
-export default TaskInput
+TaskInput.propTypes = {
+  addTodo: PropTypes.func.isRequired,
+  editTodo: PropTypes.func.isRequired,
+  finishEditTodo: PropTypes.func.isRequired,
+  currentTodo: PropTypes.oneOfType([TodoTypes, PropTypes.oneOf([null])])
+}
